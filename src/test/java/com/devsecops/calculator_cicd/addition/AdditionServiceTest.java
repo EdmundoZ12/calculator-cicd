@@ -13,7 +13,7 @@ class AdditionServiceTest {
     void shouldAddTwoPositiveNumbers() {
         double result = additionService.add(2, 3);
 
-        assertEquals(5, result);
+        assertEquals(100, result);
     }
 
     @Test
