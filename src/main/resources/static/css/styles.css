@@ -1,0 +1,120 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f4f6f8;
+    color: #222;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    text-align: center;
+    padding: 50px 20px 25px;
+}
+
+.header h1 {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.header p {
+    color: #666;
+    font-size: 18px;
+}
+
+.container {
+    width: 90%;
+    max-width: 1000px;
+    margin: auto;
+    flex: 1;
+}
+
+.operations-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+    padding: 20px 0 50px;
+}
+
+.operation-card {
+    background: white;
+    padding: 35px;
+    border-radius: 10px;
+    text-align: center;
+    text-decoration: none;
+    color: #222;
+    border: 1px solid #ddd;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.operation-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.operation-symbol {
+    font-size: 50px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.operation-card h2 {
+    margin-bottom: 10px;
+}
+
+.operation-card p {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.operation-button {
+    display: inline-block;
+    padding: 10px 25px;
+    background: #222;
+    color: white;
+    border-radius: 5px;
+}
+
+.footer {
+    text-align: center;
+    padding: 20px;
+    color: #777;
+}
+
+.operation-page {
+    width: 90%;
+    max-width: 500px;
+    margin: 60px auto;
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.operation-page h1 {
+    margin-bottom: 20px;
+}
+
+.operation-page p {
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.back-link {
+    text-decoration: none;
+    color: #222;
+    font-weight: bold;
+}
+
+@media (max-width: 700px) {
+    .operations-grid {
+        grid-template-columns: 1fr;
+    }
+}
