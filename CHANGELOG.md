@@ -51,6 +51,13 @@ El proyecto utiliza Semantic Versioning (`MAJOR.MINOR.PATCH`) para identificar l
 - Evidencia de rollback GREEN → BLUE.
 
 ---
+## [1.2.0]
+
+### Added
+- Operación de multiplicación mediante GET /api/multiply.
+- Formulario web conectado al endpoint de multiplicación.
+- Pruebas del servicio para positivos, negativos, cero y decimales.
+- Pruebas del endpoint para resultados y parámetros inválidos.
 
 ## [1.1.0]
 
