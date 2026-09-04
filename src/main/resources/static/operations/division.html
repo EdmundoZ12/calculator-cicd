@@ -17,15 +17,52 @@
 
     <h1>División</h1>
 
-    <p>
-        Esta funcionalidad será implementada próximamente.
-    </p>
+    <p>Ingrese los números que desea dividir.</p>
+
+    <form id="division-form" class="calculator-form">
+
+        <div class="form-group">
+            <label for="firstNumber">Dividendo</label>
+
+            <input
+                    type="number"
+                    id="firstNumber"
+                    step="any"
+                    required
+            >
+        </div>
+
+        <div class="form-group">
+            <label for="secondNumber">Divisor</label>
+
+            <input
+                    type="number"
+                    id="secondNumber"
+                    step="any"
+                    required
+            >
+        </div>
+
+        <button type="submit" class="calculate-button">
+            Dividir
+        </button>
+
+    </form>
+
+    <div id="result-container" class="result-container hidden">
+        <span>Resultado</span>
+        <strong id="result"></strong>
+    </div>
+
+    <p id="error-message" class="error-message"></p>
 
     <a href="/" class="back-link">
         ← Volver al inicio
     </a>
 
 </main>
+
+<script src="/js/division.js"></script>
 
 </body>
 </html>

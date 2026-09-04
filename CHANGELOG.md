@@ -6,6 +6,8 @@ El proyecto utiliza Semantic Versioning (`MAJOR.MINOR.PATCH`) para identificar l
 
 ---
 
+---
+
 ## [Unreleased]
 
 ### Added
@@ -47,6 +49,28 @@ El proyecto utiliza Semantic Versioning (`MAJOR.MINOR.PATCH`) para identificar l
 - Ejecución automática completa de CD.
 - Evidencia de promoción BLUE → GREEN.
 - Evidencia de rollback GREEN → BLUE.
+
+---
+
+## [1.3.0]
+
+### Added
+
+- Operación de división.
+- Endpoint REST `GET /api/divide?a={a}&b={b}`.
+- Servicio `DivisionService` con la lógica de división.
+- Modelo de respuesta `DivisionResponse`.
+- Modelo de respuesta de error `DivisionErrorResponse`.
+- Validación de división entre cero con respuesta `400 Bad Request`.
+- Pruebas unitarias `DivisionServiceTest`, incluida la división entre cero.
+- Pruebas de capa web `DivisionControllerTest` sobre el endpoint.
+- Interfaz web de la operación de división.
+- Integración frontend mediante `js/division.js`.
+
+### Changed
+
+- Versión del proyecto actualizada a `1.3.0`.
+- `.gitignore` ignora archivos `*.pem` y `*.key` para evitar publicar claves privadas.
 
 ---
 
