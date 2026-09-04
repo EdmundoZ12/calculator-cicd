@@ -51,6 +51,26 @@ El proyecto utiliza Semantic Versioning (`MAJOR.MINOR.PATCH`) para identificar l
 - Evidencia de rollback GREEN → BLUE.
 
 ---
+
+## [1.3.0]
+
+### Added
+
+- Operación de resta.
+- Endpoint REST `GET /api/subtract?a={a}&b={b}`.
+- Servicio `SubtractionService` con la lógica de resta.
+- Modelo de respuesta `SubtractionResponse`.
+- Pruebas unitarias `SubtractionServiceTest` para positivos, negativos, decimales y ceros.
+- Pruebas de capa web `SubtractionControllerTest` sobre el endpoint.
+- Interfaz web de la operación de resta.
+- Integración frontend mediante `js/subtraction.js`.
+
+### Changed
+
+- Versión del proyecto actualizada a `1.3.0`.
+
+---
+
 ## [1.2.0]
 
 ### Added
