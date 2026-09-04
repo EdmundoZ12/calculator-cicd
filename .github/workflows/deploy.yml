@@ -1,0 +1,156 @@
+name: CD - AWS
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: Release version to deploy
+        required: true
+        type: string
+
+    secrets:
+      EC2_HOST:
+        required: true
+
+      EC2_USER:
+        required: true
+
+      EC2_SSH_KEY:
+        required: true
+
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version to deploy (example: v1.0.1)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deployment
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy Release to AWS
+
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download release artifact
+        id: artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+        shell: bash
+        run: |
+          mkdir -p release-artifact
+
+          gh release download "${VERSION}" \
+            --pattern "*.jar" \
+            --dir release-artifact
+
+          mapfile -t JARS < <(
+            find release-artifact \
+              -maxdepth 1 \
+              -type f \
+              -name "*.jar"
+          )
+
+          if [ "${#JARS[@]}" -ne 1 ]; then
+            echo "Expected exactly one JAR artifact."
+            echo "Found: ${#JARS[@]}"
+            exit 1
+          fi
+
+          JAR_PATH="${JARS[0]}"
+          JAR_NAME="$(basename "${JAR_PATH}")"
+
+          echo "Release artifact found:"
+          echo "${JAR_NAME}"
+
+          echo "jar_path=${JAR_PATH}" >> "${GITHUB_OUTPUT}"
+          echo "jar_name=${JAR_NAME}" >> "${GITHUB_OUTPUT}"
+
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+        shell: bash
+        run: |
+          mkdir -p ~/.ssh
+
+          printf '%s\n' "${SSH_PRIVATE_KEY}" > ~/.ssh/id_rsa
+
+          chmod 600 ~/.ssh/id_rsa
+
+          ssh-keyscan -H "${EC2_HOST}" >> ~/.ssh/known_hosts
+
+      - name: Prepare deployment directories
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+        shell: bash
+        run: |
+          ssh "${EC2_USER}@${EC2_HOST}" "
+            sudo mkdir -p \
+              /opt/calculator-cicd/releases \
+              /opt/calculator-cicd/logs \
+              /opt/calculator-cicd/run \
+              /opt/calculator-cicd/scripts
+
+            sudo chown -R \
+              ${EC2_USER}:${EC2_USER} \
+              /opt/calculator-cicd
+          "
+
+      - name: Copy release artifact to EC2
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+          JAR_PATH: ${{ steps.artifact.outputs.jar_path }}
+          JAR_NAME: ${{ steps.artifact.outputs.jar_name }}
+        shell: bash
+        run: |
+          scp "${JAR_PATH}" \
+            "${EC2_USER}@${EC2_HOST}:/tmp/${JAR_NAME}"
+
+      - name: Copy deployment scripts to EC2
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+        shell: bash
+        run: |
+          scp scripts/*.sh \
+            "${EC2_USER}@${EC2_HOST}:/opt/calculator-cicd/scripts/"
+
+          ssh "${EC2_USER}@${EC2_HOST}" \
+            "chmod +x /opt/calculator-cicd/scripts/*.sh"
+
+      - name: Execute Blue-Green deployment
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+          VERSION: ${{ inputs.version }}
+          JAR_NAME: ${{ steps.artifact.outputs.jar_name }}
+        shell: bash
+        run: |
+          ssh "${EC2_USER}@${EC2_HOST}" \
+            "/opt/calculator-cicd/scripts/deploy.sh \
+              '${VERSION}' \
+              '/tmp/${JAR_NAME}'"
+
+      - name: Verify deployed application
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+        shell: bash
+        run: |
+          ssh "${EC2_USER}@${EC2_HOST}" \
+            "/opt/calculator-cicd/scripts/traffic-test.sh \
+              localhost 80 5"

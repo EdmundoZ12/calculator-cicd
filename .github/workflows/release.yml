@@ -29,25 +29,37 @@ jobs:
         shell: bash
         run: |
           TAG_VERSION="${GITHUB_REF_NAME#v}"
+
           POM_VERSION=$(mvn help:evaluate \
             -Dexpression=project.version \
             -q \
             -DforceStdout)
 
-          echo "Tag version: $TAG_VERSION"
-          echo "POM version: $POM_VERSION"
+          echo "Tag version: ${TAG_VERSION}"
+          echo "POM version: ${POM_VERSION}"
 
-          if [ "$TAG_VERSION" != "$POM_VERSION" ]; then
+          if [ "${TAG_VERSION}" != "${POM_VERSION}" ]; then
             echo "Tag version does not match pom.xml version."
             exit 1
           fi
 
-      - name: Build and test application
+          echo "Version validation successful."
+
+      - name: Build, test and package application
         run: mvn -B clean verify --file pom.xml
 
       - name: Verify release artifact
         shell: bash
         run: |
+          JAR_COUNT=$(find target -maxdepth 1 -type f -name "*.jar" | wc -l)
+
+          if [ "${JAR_COUNT}" -ne 1 ]; then
+            echo "Expected exactly one JAR artifact."
+            echo "Found: ${JAR_COUNT}"
+            exit 1
+          fi
+
+          echo "Release artifact:"
           ls -lh target/*.jar
 
       - name: Publish GitHub Release
@@ -55,7 +67,22 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
-          gh release create "$GITHUB_REF_NAME" \
+          gh release create "${GITHUB_REF_NAME}" \
             target/*.jar \
-            --title "$GITHUB_REF_NAME" \
+            --title "${GITHUB_REF_NAME}" \
             --generate-notes
+
+  deploy:
+    name: Trigger AWS Deployment
+
+    needs:
+      - release
+
+    if: ${{ vars.ENABLE_AWS_DEPLOY == 'true' }}
+
+    uses: ./.github/workflows/deploy.yml
+
+    with:
+      version: ${{ github.ref_name }}
+
+    secrets: inherit
