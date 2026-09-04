@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       version:
-        description: Release version to deploy
+        description: "Release version to deploy"
         required: true
         type: string
 
@@ -21,7 +21,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: Release version to deploy (example: v1.0.1)
+        description: "Release version to deploy (example: v1.0.1)"
         required: true
         type: string
 
