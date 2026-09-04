@@ -52,7 +52,7 @@ El proyecto utiliza Semantic Versioning (`MAJOR.MINOR.PATCH`) para identificar l
 
 ---
 
-## [1.3.0]
+## [1.1.0]
 
 ### Added
 
@@ -69,7 +69,7 @@ El proyecto utiliza Semantic Versioning (`MAJOR.MINOR.PATCH`) para identificar l
 
 ### Changed
 
-- Versión del proyecto actualizada a `1.3.0`.
+- Versión del proyecto actualizada a `1.1.0`.
 - `.gitignore` ignora archivos `*.pem` y `*.key` para evitar publicar claves privadas.
 
 ---
